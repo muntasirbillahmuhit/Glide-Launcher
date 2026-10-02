@@ -14,17 +14,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.LauncherScreen
 import com.example.ui.LauncherViewModel
 import com.example.ui.components.DockBar
+import com.example.ui.components.IconCustomizerSheet
 import com.example.ui.components.XrayBackground
 import com.example.ui.screens.AppDrawerScreen
 import com.example.ui.screens.HomeScreen
-import com.example.ui.theme.CyberDarkBg
+import com.example.ui.theme.HudThemePreset
+import com.example.ui.theme.ObsidianBg
 import com.example.ui.theme.XRayLauncherTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,29 +40,39 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
         setContent {
-            val currentScreen by viewModel.currentScreen.collectAsState()
-            val filteredApps by viewModel.filteredApps.collectAsState()
-            val pinnedApps by viewModel.pinnedApps.collectAsState()
-            val dockApps by viewModel.dockApps.collectAsState()
-            val searchQuery by viewModel.searchQuery.collectAsState()
+            val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
+            val filteredApps by viewModel.filteredApps.collectAsStateWithLifecycle()
+            val pinnedApps by viewModel.pinnedApps.collectAsStateWithLifecycle()
+            val dockApps by viewModel.dockApps.collectAsStateWithLifecycle()
+            val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+            val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
+            val iconConfig by viewModel.iconConfig.collectAsStateWithLifecycle()
 
-            XRayLauncherTheme {
+            var showCustomizerSheet by remember { mutableStateOf(false) }
+
+            val themePreset = remember(iconConfig.themePresetName) {
+                try {
+                    HudThemePreset.valueOf(iconConfig.themePresetName)
+                } catch (e: Exception) {
+                    HudThemePreset.GLIDE_CYAN
+                }
+            }
+
+            XRayLauncherTheme(themePreset = themePreset) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = CyberDarkBg
+                    color = ObsidianBg
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        XrayBackground(
-                            showGrid = true,
-                            showParticles = false
-                        )
+                        XrayBackground()
 
                         AnimatedContent(
                             targetState = currentScreen,
                             transitionSpec = {
-                                fadeIn(animationSpec = tween(200)) togetherWith
-                                fadeOut(animationSpec = tween(150))
+                                fadeIn(animationSpec = tween(220)) togetherWith
+                                fadeOut(animationSpec = tween(180))
                             },
                             label = "screen_transition",
                             modifier = Modifier.fillMaxSize()
@@ -66,6 +81,8 @@ class MainActivity : ComponentActivity() {
                                 LauncherScreen.HOME -> {
                                     HomeScreen(
                                         pinnedApps = pinnedApps,
+                                        config = iconConfig,
+                                        onOpenCustomizer = { showCustomizerSheet = true },
                                         onNavigate = viewModel::navigateTo,
                                         onLaunchApp = viewModel::launchApp,
                                         onTogglePin = viewModel::togglePin,
@@ -76,7 +93,11 @@ class MainActivity : ComponentActivity() {
                                     AppDrawerScreen(
                                         apps = filteredApps,
                                         searchQuery = searchQuery,
+                                        selectedCategory = selectedCategory,
+                                        config = iconConfig,
+                                        onOpenCustomizer = { showCustomizerSheet = true },
                                         onSearchChange = viewModel::setSearchQuery,
+                                        onCategoryChange = viewModel::setCategory,
                                         onNavigate = viewModel::navigateTo,
                                         onLaunchApp = viewModel::launchApp,
                                         onTogglePin = viewModel::togglePin,
@@ -90,12 +111,26 @@ class MainActivity : ComponentActivity() {
                         DockBar(
                             dockApps = dockApps,
                             currentScreen = currentScreen,
+                            config = iconConfig,
                             onNavigate = viewModel::navigateTo,
                             onLaunchApp = viewModel::launchApp,
                             onTogglePin = viewModel::togglePin,
                             onOpenDetails = viewModel::openAppDetails,
                             modifier = Modifier.align(Alignment.BottomCenter)
                         )
+
+                        // Icon Design Customizer Bottom Sheet
+                        if (showCustomizerSheet) {
+                            IconCustomizerSheet(
+                                config = iconConfig,
+                                onUpdateShape = viewModel::updateIconShape,
+                                onUpdateStyle = viewModel::updateIconStyle,
+                                onUpdateScale = viewModel::updateIconScale,
+                                onToggleLabels = viewModel::toggleShowLabels,
+                                onUpdateTheme = viewModel::updateThemePreset,
+                                onDismiss = { showCustomizerSheet = false }
+                            )
+                        }
                     }
                 }
             }

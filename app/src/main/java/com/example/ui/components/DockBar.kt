@@ -1,5 +1,10 @@
 package com.example.ui.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,13 +25,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.example.data.model.AppItem
+import com.example.data.model.IconDesignConfig
 import com.example.ui.LauncherScreen
-import com.example.ui.theme.CyberSurface
+import com.example.ui.theme.FrostedGlassBorder
+import com.example.ui.theme.FrostedSurface
 import com.example.ui.theme.LocalHudPreset
 import com.example.ui.theme.TextPrimary
 
@@ -34,6 +42,7 @@ import com.example.ui.theme.TextPrimary
 fun DockBar(
     dockApps: List<AppItem>,
     currentScreen: LauncherScreen,
+    config: IconDesignConfig = IconDesignConfig(),
     onNavigate: (LauncherScreen) -> Unit,
     onLaunchApp: (AppItem) -> Unit,
     onTogglePin: (AppItem) -> Unit,
@@ -46,34 +55,46 @@ fun DockBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .padding(horizontal = 24.dp, vertical = 12.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .shadow(
+                    elevation = 16.dp,
+                    shape = RoundedCornerShape(32.dp),
+                    ambientColor = Color.Black.copy(alpha = 0.5f),
+                    spotColor = Color.Black.copy(alpha = 0.7f)
+                )
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            CyberSurface.copy(alpha = 0.92f),
-                            CyberSurface.copy(alpha = 0.98f)
+                            FrostedSurface.copy(alpha = 0.88f),
+                            FrostedSurface.copy(alpha = 0.96f)
                         )
                     ),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(32.dp)
                 )
                 .border(
                     width = 1.dp,
-                    color = theme.primary.copy(alpha = 0.35f),
-                    shape = RoundedCornerShape(24.dp)
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.3f),
+                            FrostedGlassBorder
+                        )
+                    ),
+                    shape = RoundedCornerShape(32.dp)
                 )
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Dock Favorite Apps (Up to 4)
-            dockApps.take(4).forEach { app ->
+            dockApps.distinctBy { it.packageName }.take(4).forEach { app ->
                 AppIconItem(
                     app = app,
-                    iconSize = 42.dp,
+                    config = config,
+                    iconSize = 44.dp,
                     showLabel = false,
                     onLaunch = onLaunchApp,
                     onTogglePin = onTogglePin,
@@ -81,14 +102,22 @@ fun DockBar(
                 )
             }
 
-            // All Apps Drawer / Home Toggle Button
+            // All Apps Drawer / Home Switcher Pill
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(46.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
-                    .background(theme.primary.copy(alpha = 0.15f), shape = CircleShape)
-                    .border(1.dp, theme.primary.copy(alpha = 0.6f), shape = CircleShape)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                theme.primary.copy(alpha = 0.25f),
+                                theme.secondary.copy(alpha = 0.25f)
+                            )
+                        ),
+                        shape = CircleShape
+                    )
+                    .border(1.dp, theme.primary.copy(alpha = 0.6f), CircleShape)
                     .clickable {
                         if (currentScreen == LauncherScreen.DRAWER) {
                             onNavigate(LauncherScreen.HOME)
@@ -98,12 +127,18 @@ fun DockBar(
                     }
                     .testTag("dock_toggle_drawer_button")
             ) {
-                Icon(
-                    imageVector = if (currentScreen == LauncherScreen.DRAWER) Icons.Default.Home else Icons.Default.Apps,
-                    contentDescription = "Toggle Drawer",
-                    tint = theme.primary,
-                    modifier = Modifier.size(22.dp)
-                )
+                AnimatedContent(
+                    targetState = currentScreen,
+                    transitionSpec = { fadeIn(tween(150)) togetherWith fadeOut(tween(150)) },
+                    label = "drawer_icon_anim"
+                ) { screen ->
+                    Icon(
+                        imageVector = if (screen == LauncherScreen.DRAWER) Icons.Default.Home else Icons.Default.Apps,
+                        contentDescription = "Toggle Drawer",
+                        tint = theme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     }

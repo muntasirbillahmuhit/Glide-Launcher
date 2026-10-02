@@ -6,5 +6,6 @@ data class AppItem(
     val packageName: String,
     val label: String,
     val icon: Drawable? = null,
-    val isPinned: Boolean = false
+    val isPinned: Boolean = false,
+    val category: String = "All"
 )

@@ -53,4 +53,23 @@ class ExampleRobolectricTest {
         val filtered = viewModel.filteredApps.first()
         assertNotNull(filtered)
     }
+
+    @Test
+    fun `viewmodel updates icon design config correctly`() = runBlocking {
+        val app = ApplicationProvider.getApplicationContext<Application>()
+        val viewModel = LauncherViewModel(app)
+
+        assertEquals(com.example.data.model.IconShape.SQUIRCLE, viewModel.iconConfig.value.shape)
+        viewModel.updateIconShape(com.example.data.model.IconShape.CIRCLE)
+        assertEquals(com.example.data.model.IconShape.CIRCLE, viewModel.iconConfig.value.shape)
+
+        viewModel.updateIconStyle(com.example.data.model.IconStyle.NEON_GLOW)
+        assertEquals(com.example.data.model.IconStyle.NEON_GLOW, viewModel.iconConfig.value.style)
+
+        viewModel.updateIconScale(com.example.data.model.IconScale.LARGE)
+        assertEquals(com.example.data.model.IconScale.LARGE, viewModel.iconConfig.value.scale)
+
+        viewModel.toggleShowLabels(false)
+        assertEquals(false, viewModel.iconConfig.value.showLabels)
+    }
 }

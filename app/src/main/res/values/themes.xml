@@ -5,4 +5,5 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@color/cyber_dark_bg</item>
     </style>
+    <style name="Theme.GlideLauncher" parent="Theme.XRayLauncher" />
 </resources>

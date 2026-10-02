@@ -2,35 +2,23 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Futuristic Cyber HUD Color Palette
-val CyberDarkBg = Color(0xFF070B14)
-val CyberSurface = Color(0xFF0E1726)
-val CyberSurfaceVariant = Color(0xFF16243B)
-val CyberSurfaceGlow = Color(0x3300F0FF)
+// Obsidian & Frosted Glass Palette for Glide Launcher
+val ObsidianBg = Color(0xFF090D16)
+val FrostedSurface = Color(0xFF131B2E)
+val FrostedSurfaceVariant = Color(0xFF1C273E)
+val FrostedGlassBorder = Color(0x33FFFFFF)
+val FrostedGlassGlow = Color(0x2200E5FF)
 
-val NeonCyan = Color(0xFF00F0FF)
-val NeonCyanDim = Color(0x3300F0FF)
-val NeonCyanBright = Color(0xFF80F8FF)
+val GlideAccent = Color(0xFF00E5FF)
+val GlideSecondary = Color(0xFF8B5CF6)
+val GlideEmerald = Color(0xFF10B981)
+val GlideAmber = Color(0xFFF59E0B)
 
-val NeonAmber = Color(0xFFFFB300)
-val NeonAmberDim = Color(0x33FFB300)
+val TextPrimary = Color(0xFFF8FAFC)
+val TextSecondary = Color(0xFF94A3B8)
+val TextMuted = Color(0xFF64748B)
 
-val NeonPurple = Color(0xFFD500F9)
-val NeonPurpleDim = Color(0x33D500F9)
-
-val NeonGreen = Color(0xFF00E676)
-val NeonGreenDim = Color(0x3300E676)
-
-val NeonRed = Color(0xFFFF1744)
-val NeonRedDim = Color(0x33FF1744)
-
-val CyberGridLine = Color(0xFF1A2A44)
-val CyberGridScan = Color(0x2200F0FF)
-
-val TextPrimary = Color(0xFFE0F7FA)
-val TextSecondary = Color(0xFF90A4AE)
-val TextMuted = Color(0xFF546E7A)
-
+// Presets if user switches theme
 enum class HudThemePreset(
     val title: String,
     val primary: Color,
@@ -38,9 +26,8 @@ enum class HudThemePreset(
     val secondary: Color,
     val accent: Color
 ) {
-    CYAN_MATRIX("CYAN MATRIX", NeonCyan, NeonCyanDim, Color(0xFF00B0FF), NeonGreen),
-    AMBER_HAZARD("AMBER HAZARD", NeonAmber, NeonAmberDim, Color(0xFFFF9100), NeonRed),
-    PURPLE_SYNTH("SYNTH PURPLE", NeonPurple, NeonPurpleDim, Color(0xFF7C4DFF), NeonCyan),
-    EMERALD_CYBER("EMERALD CYBER", NeonGreen, NeonGreenDim, Color(0xFF64DD17), NeonCyan),
-    CRIMSON_THREAT("CRIMSON THREAT", NeonRed, NeonRedDim, Color(0xFFFF5252), NeonAmber)
+    GLIDE_CYAN("Glide Cyan", GlideAccent, Color(0x2200E5FF), GlideSecondary, GlideEmerald),
+    VIOLET_DREAM("Violet Dream", Color(0xFFA855F7), Color(0x22A855F7), Color(0xFFEC4899), GlideAccent),
+    EMERALD_MINT("Emerald Mint", Color(0xFF10B981), Color(0x2210B981), Color(0xFF06B6D4), Color(0xFFF59E0B)),
+    SUNSET_AMBER("Sunset Amber", Color(0xFFF59E0B), Color(0x22F59E0B), Color(0xFFEF4444), Color(0xFF8B5CF6))
 }
